@@ -139,6 +139,22 @@ fun TipCalculatorScreen(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.titleLarge
             )
 
+            Spacer(Modifier.height(20.dp))
+
+
+            Button(
+                onClick = { showTotal = !showTotal },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (showTotal) {
+                    Text("Скидка")
+                }
+                else {
+                    Text("Итого")
+
+                }
+            }
+
         }
     }
 }
