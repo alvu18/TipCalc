@@ -117,10 +117,38 @@ fun TipCalculatorScreen(modifier: Modifier = Modifier) {
             )
 
             Spacer(Modifier.height(20.dp))
+
+            // Радиокнопки (НЕ нажимаются пользователем)
+            Text("Скидка (программный выбор): $discountPercent%")
+
+            Column {
+                DiscountRadio("1–2 блюда → 3%", selected = discountPercent == 3)
+                DiscountRadio("3–5 блюд → 5%", selected = discountPercent == 5)
+                DiscountRadio("6–10 блюд → 7%", selected = discountPercent == 7)
+                DiscountRadio("Более 10 блюд → 10%", selected = discountPercent == 10)
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            // Поле со скидкой / Итогом
+            Text(
+                text = if (!showTotal)
+                    "Скидка: ${"%.2f".format(discountAmount)} ₽"
+                else
+                    "Итого: ${"%.2f".format(total)} ₽",
+                style = MaterialTheme.typography.titleLarge
+            )
+
         }
     }
+}
 
-
+@Composable
+fun DiscountRadio(text: String, selected: Boolean) {
+    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        RadioButton(selected = selected, onClick = {})
+        Text(text)
+    }
 }
 
 fun calculateTip(sum: Float, percent: Float): Float = sum * percent / 100f
