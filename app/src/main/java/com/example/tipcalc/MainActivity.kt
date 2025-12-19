@@ -56,6 +56,18 @@ class MainActivity : ComponentActivity() {
 fun TipCalculatorScreen(modifier: Modifier = Modifier) {
     var orderSum by remember { mutableStateOf("") }
     var dishesCount by remember { mutableStateOf("") }
+    var tipPercent by remember { mutableFloatStateOf(0f) }
+    var showTotal by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    val discountPercent = calculateDiscount(dishesCount.toIntOrNull() ?: 0)
+
+    val tipAmount = calculateTip(orderSum.toFloatOrNull() ?: 0f, tipPercent)
+    val discountAmount = calculateDiscountAmount(orderSum.toFloatOrNull() ?: 0f, discountPercent)
+
+    val total = (orderSum.toFloatOrNull() ?: 0f) + tipAmount - discountAmount
 
     Scaffold(
     ) { padding ->
@@ -84,6 +96,42 @@ fun TipCalculatorScreen(modifier: Modifier = Modifier) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(Modifier.height(20.dp))
+
+            Text("Процент чаевых: ${tipPercent.toInt()}%")
+
+            Slider(
+                value = tipPercent,
+                onValueChange = { newValue ->
+                    tipPercent = newValue
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "Чаевые: ${"%.2f".format(tipAmount)} ₽",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                },
+                valueRange = 0f..25f,
+                steps = 4  // шаг 5%
+            )
+
+            Spacer(Modifier.height(20.dp))
         }
     }
+
+
 }
+
+fun calculateTip(sum: Float, percent: Float): Float = sum * percent / 100f
+
+fun calculateDiscount(dishes: Int): Int = when {
+    dishes in 1..2 -> 3
+    dishes in 3..5 -> 5
+    dishes in 6..10 -> 7
+    dishes > 10 -> 10
+    else -> 0
+}
+
+fun calculateDiscountAmount(sum: Float, discountPercent: Int): Float =
+    sum * discountPercent / 100f
